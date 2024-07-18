@@ -15,8 +15,8 @@ import requests as req
 
 def signup(request):
     if request.method == "POST":
-        username = request.POST.get["username"]
-        password = request.POST.get["password"]
+        username = request.POST.get("username")
+        password = request.POST.get("password")
         try:
             user = User.objects.filter(username=username).first()
             if user:
@@ -55,7 +55,7 @@ def photos(request):
 
 def login_view(request):
     if request.method == "POST":
-        username = request.POST.get("username")
+        username = request.POST("username")
         password = request.POST.get("password")
         try:
             user = User.objects.get(username=username)
@@ -73,7 +73,23 @@ def logout_view(request):
     return HttpResponseRedirect(reverse("login"))
 
 def concerts(request):
-    pass
+    if request.user.is_authenticated:
+        lst_of_concerts = []
+        concert_objects = Concert.objects.all()
+        for concert in concert_objects:
+            try:
+                status = concert.attendee.filter(
+                    username=request.user).first.attending
+            except:
+                status = "-"
+            
+            lst_of_concerts.append({
+                "concert": concert,
+                "status": status
+            })
+        return render(request, 'concerts.html', {"concerts":lst_of_concerts})
+    else:
+        return HttpResponseRedirect(reverse("login"))
 
 
 def concert_detail(request, id):
@@ -86,7 +102,6 @@ def concert_detail(request, id):
         return render(request, "concert_detail.html", {"concert_details": obj, "status": status, "attending_choices": ConcertAttending.AttendingChoices.choices})
     else:
         return HttpResponseRedirect(reverse("login"))
-    pass
 
 
 def concert_attendee(request):
