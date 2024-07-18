@@ -41,12 +41,12 @@ class ConcertAttending(models.Model):
 
 
 class Photo(models.Model):
-    # id
-    # pic_url
-    # event_country
-    # event_state
-    # event_city
-    # event_date
+    id = models.IntegerField(primary_key=True)
+    pic_url = models.CharField(max_length=1000)
+    event_country = models.CharField(max_length=255)
+    event_state = models.CharField(max_length=255)
+    event_city = models.CharField(max_length=255)
+    event_date = models.DateField(default=datetime.now)
 
     class Meta:
         managed = False
