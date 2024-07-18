@@ -14,13 +14,13 @@ import requests as req
 # Create your views here.
 
 def signup(request):
-    if request.method == 'POST':
-        username = request.POST.get['username']
-        password = request.POST.get['password']
+    if request.method == "POST":
+        username = request.POST.get["username"]
+        password = request.POST.get["password"]
         try:
             user = User.objects.filter(username=username).first()
             if user:
-                return render(request, 'signup.html', context={'form':SignUpForm, "message":"user already exists"})
+                return render(request, "signup.html", context={"form":SignUpForm, "message":"user already exists"})
             else:
                 user = User.objects.create(
                     username=username,
@@ -29,8 +29,8 @@ def signup(request):
                 login(request, user)
                 return HttpResponseRedirect(reverse("index"))
         except User.DoesNotExist:
-            return render(request, 'signup.html', {'form':SignUpForm})
-    return render(request, 'signup.html', {'form':SignUpForm})
+            return render(request, "signup.html", {"form":SignUpForm})
+    return render(request, "signup.html", {"form":SignUpForm})
 
 
 def index(request):
@@ -39,7 +39,7 @@ def index(request):
 
 def songs(request):
     songs = {"songs":[{"id":1,"title":"duis faucibus accumsan odio curabitur convallis","lyrics":"Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis."}]}
-    return render(request, "songs.html", {"songs": songs['songs']})
+    return render(request, "songs.html", {"songs": songs["songs"]})
 
 
 def photos(request):
@@ -54,10 +54,23 @@ def photos(request):
     return render(request, "photos.html", {"photos": photos})
 
 def login_view(request):
-    pass
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        try:
+            user = User.objects.get(username=username)
+            if user.check_password(password):
+                login(request, user)
+                return HttpResponseRedirect(reverse("index"))
+            
+        except User.DoesNotExist:    
+            return render(request, "login.html", {"form":LoginForm})
+        
+    return render(request, "login.html", {"form":LoginForm})
 
 def logout_view(request):
-    pass
+    logout(request)
+    return HttpResponseRedirect(reverse("login"))
 
 def concerts(request):
     pass
